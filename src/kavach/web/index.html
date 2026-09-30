@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f4f4ef">
+    <title>Kavach — Prepare text for AI</title>
+    <link rel="stylesheet" href="/styles.css?v=phase6-desktop-2">
+</head>
+<body>
+    <div class="container">
+        <header class="site-header">
+            <div class="topline">
+                <a class="wordmark" href="/" aria-label="Kavach home">Kavach</a>
+                <div id="status" class="status" role="status" aria-live="polite">
+                    <span class="status-indicator" aria-hidden="true"></span>
+                    <span id="status-text">Checking local service…</span>
+                </div>
+            </div>
+            <div class="intro">
+                <p class="eyebrow">LOCAL PRIVACY WORKSPACE</p>
+                <h1>Prepare text before you share it.</h1>
+                <p class="subtitle">Review personal details, redact what you choose, then restore them in the reply.</p>
+            </div>
+        </header>
+
+        <nav class="workflow-nav" aria-label="Redaction workflow">
+            <ol class="workflow-steps">
+                <li class="workflow-step is-current" id="workflow-step-1" data-step="1" aria-current="step">
+                    <span class="step-number" aria-hidden="true">01</span><span>Prepare</span>
+                </li>
+                <li class="workflow-step" id="workflow-step-2" data-step="2">
+                    <span class="step-number" aria-hidden="true">02</span><span>Review</span>
+                </li>
+                <li class="workflow-step" id="workflow-step-3" data-step="3">
+                    <span class="step-number" aria-hidden="true">03</span><span>Redact</span>
+                </li>
+                <li class="workflow-step" id="workflow-step-4" data-step="4">
+                    <span class="step-number" aria-hidden="true">04</span><span>Restore</span>
+                </li>
+            </ol>
+        </nav>
+
+        <main>
+            <section class="work-section" id="input-section" aria-labelledby="input-heading">
+                <div class="section-heading">
+                    <p class="section-kicker">STEP 01 <span>/</span> PREPARE</p>
+                    <h2 id="input-heading">Add text to review</h2>
+                    <p class="help-text">Paste a message or choose a document. Nothing is sent to an AI service from here.</p>
+                </div>
+                <div class="tab-buttons" role="tablist" aria-label="Choose input type">
+                    <button type="button" class="tab-btn active" data-tab="text" role="tab" aria-selected="true" aria-controls="text-tab">Paste text</button>
+                    <button type="button" class="tab-btn" data-tab="file" role="tab" aria-selected="false" aria-controls="file-tab">Choose a file</button>
+                </div>
+
+                <div class="tab-content active" id="text-tab" role="tabpanel">
+                    <label class="visually-hidden" for="input-text">Text to analyze</label>
+                    <textarea id="input-text" placeholder="Paste the text you plan to share…" rows="5"></textarea>
+                    <div class="input-footer">
+                        <span class="field-note">Text is analyzed on this device.</span>
+                        <button type="button" id="analyze-btn" class="btn btn-primary">Find personal details</button>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="file-tab" role="tabpanel" hidden>
+                    <label class="file-label" for="file-input">
+                        <span class="file-label-title">Select an image or PDF</span>
+                        <span class="field-note">Choose a file from this device to extract its text.</span>
+                    </label>
+                    <input type="file" id="file-input" accept="image/*,.pdf" aria-label="Choose an image or PDF">
+                    <button type="button" id="ingest-btn" class="btn btn-primary">Extract and review</button>
+                    <div id="extracted-text-display" class="extracted-text" aria-live="polite"></div>
+                </div>
+            </section>
+
+            <section class="work-section" id="review-section" aria-labelledby="review-heading" style="display:none;">
+                <div class="section-heading">
+                    <p class="section-kicker">STEP 02 <span>/</span> REVIEW</p>
+                    <h2 id="review-heading">Choose what to redact</h2>
+                    <p class="help-text">Values stay hidden until you reveal them. Only approved items will be replaced.</p>
+                </div>
+                <div id="candidates-list" aria-live="polite"></div>
+                <div class="actions">
+                    <button type="button" id="redact-btn" class="btn btn-primary" disabled>Redact approved details</button>
+                    <button type="button" id="edit-source-btn" class="btn btn-secondary">Edit text</button>
+                    <button type="button" id="cancel-review-btn" class="btn btn-quiet">Back</button>
+                </div>
+            </section>
+
+            <section class="work-section output-section" id="redacted-section" aria-labelledby="redacted-heading" style="display:none;">
+                <div class="section-heading">
+                    <p class="section-kicker">STEP 03 <span>/</span> REDACT</p>
+                    <h2 id="redacted-heading">Your text is ready to copy</h2>
+                    <p class="help-text">Share the redacted text with your AI service. Keep the session ID so you can restore its reply.</p>
+                </div>
+                <div class="session-info">
+                    <span class="session-label">Restore session ID</span>
+                    <code id="session-id"></code>
+                </div>
+                <label class="visually-hidden" for="redacted-text">Redacted text</label>
+                <textarea id="redacted-text" readonly rows="8"></textarea>
+                <div class="actions">
+                    <button type="button" id="copy-redacted-btn" class="btn btn-primary">Copy redacted text</button>
+                    <button type="button" id="new-analysis-btn" class="btn btn-secondary">Start over</button>
+                </div>
+            </section>
+
+            <section class="restore-section" id="restore-section" aria-labelledby="restore-heading">
+                <div class="section-heading">
+                    <p class="section-kicker">STEP 04 <span>/</span> RESTORE</p>
+                    <h2 id="restore-heading">Restore the AI reply</h2>
+                    <p class="help-text">After you receive a reply, paste it here to replace Kavach placeholders with the original values.</p>
+                </div>
+                <label class="visually-hidden" for="response-text">AI response containing Kavach placeholders</label>
+                <textarea id="response-text" placeholder="Paste the AI response here…" rows="6"></textarea>
+                <div class="input-footer">
+                    <span class="field-note">Restoration uses the active session above.</span>
+                    <button type="button" id="restore-btn" class="btn btn-primary">Restore original details</button>
+                </div>
+                <div id="restored-output" class="restored-output" style="display:none;">
+                    <h3>Restored reply</h3>
+                    <label class="visually-hidden" for="restored-text">Restored reply text</label>
+                    <textarea id="restored-text" readonly rows="8"></textarea>
+                    <div class="restore-stats" role="status" aria-live="polite">
+                        <span id="restore-count"></span>
+                        <span id="unresolved-tokens"></span>
+                    </div>
+                </div>
+            </section>
+
+            <details class="utility-panel">
+                <summary>Hardware &amp; benchmark <span class="utility-note">Optional</span></summary>
+                <div class="collapsible-content">
+                    <div class="hardware-info">
+                        <h3>Device capabilities</h3>
+                        <div id="capabilities-info"></div>
+                    </div>
+                    <div class="benchmark-section">
+                        <h3>Run a local benchmark</h3>
+                        <p class="help-text">Uses synthetic samples only; no personal text is included.</p>
+                        <button type="button" id="benchmark-btn" class="btn btn-secondary">Run benchmark</button>
+                        <div id="benchmark-result" style="display:none;" aria-live="polite"></div>
+                    </div>
+                </div>
+            </details>
+        </main>
+
+        <footer class="site-footer">
+            <div class="local-note"><span class="local-indicator" aria-hidden="true"></span>Processing stays on this device.</div>
+            <button type="button" id="clear-session-btn" class="btn btn-quiet btn-reset">Clear session and reset</button>
+        </footer>
+    </div>
+
+    <script src="/app.js?v=phase6-visual-refresh"></script>
+</body>
+</html>
